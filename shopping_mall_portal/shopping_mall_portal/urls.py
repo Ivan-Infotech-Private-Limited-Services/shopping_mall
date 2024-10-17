@@ -24,4 +24,6 @@ urlpatterns = [
     path('shop/<int:id>/', ShopViewTwo),
     path('category/', CategoryView),
     path('category/<int:id>/', CategoryViewTwo),
+    path('product/', ProductView),
+    path('product/<int:id>/', ProductViewTwo),
 ]
