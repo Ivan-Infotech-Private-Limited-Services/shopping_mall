@@ -56,3 +56,45 @@ def ShopViewTwo(request, id):
       return JsonResponse(data, safe=False)
    else:
       return JsonResponse({"message": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def CategoryView(request):
+   if request.method == 'GET':
+      data = serializers.serialize("json", Category.objects.all())
+      return JsonResponse(json.loads(data), safe=False)
+   elif request.method == 'POST':
+      body = json.loads(request.body.decode("utf-8"))
+      newrecord = Category.objects.create(
+         name=body['name'],
+         description=body['description'],
+         image_url=body['image_url'],
+      )
+      data = json.loads(serializers.serialize('json', [newrecord]))
+      return JsonResponse({"message": "Category created successfully","data":data})
+   else:
+      return JsonResponse({"message": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def CategoryViewTwo(request, id):
+   if request.method == 'PUT':
+      body = json.loads(request.body.decode("utf-8"))
+      Category.objects.filter(pk=id).update(
+         name=body['name'],
+         description=body['description'],
+         image_url=body['image_url'],
+      )
+      newrecord = Category.objects.filter(pk=id)
+      data = json.loads(serializers.serialize('json', newrecord))
+      return JsonResponse({"message": "Category updated successfully","data":data})
+   elif request.method == 'DELETE':
+      # body = json.loads(request.body.decode("utf-8"))
+      Category.objects.filter(pk=id).delete()
+      newrecord = Category.objects.all()
+      data = json.loads(serializers.serialize('json', newrecord))
+      return JsonResponse({"message": "Category deleted successfully","data":data})
+   elif request.method == 'GET':
+      newrecord = Category.objects.filter(pk=id)
+      data = json.loads(serializers.serialize('json', newrecord))
+      return JsonResponse(data, safe=False)
+   else:
+      return JsonResponse({"message": "Invalid request method"}, status=405)
