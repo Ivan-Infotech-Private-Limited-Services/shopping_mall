@@ -45,7 +45,7 @@ def ShopViewTwo(request, id):
       data = json.loads(serializers.serialize('json', newrecord))
       return JsonResponse({"message": "Shop updated successfully","data":data})
    elif request.method == 'DELETE':
-      body = json.loads(request.body.decode("utf-8"))
+      # body = json.loads(request.body.decode("utf-8"))
       Shop.objects.filter(pk=id).delete()
       newrecord = Shop.objects.all()
       data = json.loads(serializers.serialize('json', newrecord))
