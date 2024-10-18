@@ -4,6 +4,8 @@ class Category(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
     image_url = models.URLField()
+    def __str__(self):
+        return self.name
 
 class Shop(models.Model):
     name = models.CharField(max_length=50)
@@ -14,6 +16,8 @@ class Shop(models.Model):
     phone1 = models.CharField(max_length=50)
     phone2 = models.CharField(max_length=50, null=True, blank=True)
     image_url = models.URLField()
+    def __str__(self):
+        return self.name
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
@@ -25,3 +29,5 @@ class Product(models.Model):
     image_url = models.URLField(null=True)
     stock_count = models.IntegerField(null=True)
     variant = models.CharField(max_length=50, null=True)
+    def __str__(self):
+        return self.name
