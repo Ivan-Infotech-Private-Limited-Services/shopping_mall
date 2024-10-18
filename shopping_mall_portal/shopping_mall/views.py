@@ -10,6 +10,7 @@ def ShopView(request):
       data = serializers.serialize("json", Shop.objects.all())
       return JsonResponse(json.loads(data), safe=False)
    elif request.method == 'POST':
+      
       body = json.loads(request.body.decode("utf-8"))
       newrecord = Shop.objects.create(
          name=body['name'],
@@ -46,7 +47,8 @@ def ShopViewTwo(request, id):
       return JsonResponse({"message": "Shop updated successfully","data":data})
    elif request.method == 'DELETE':
       shop = Shop.objects.get(pk=id)
-      has_childeren = shop.children.exists()
+      print(id,shop,"***********")
+      has_childeren = shop.delete()
       if has_childeren == False:
          # body = json.loads(request.body.decode("utf-8"))
          Shop.objects.filter(pk=id).delete()
@@ -54,7 +56,7 @@ def ShopViewTwo(request, id):
          data = json.loads(serializers.serialize('json', newrecord))
          return JsonResponse({"message": "Shop deleted successfully","data":data})
       else:
-         return JsonResponse({"message": "Shop cannot be deleted"}, status=404)
+         return JsonResponse({"message": "Shop deleted successfully","data":data})
    elif request.method == 'GET':
       newrecord = Shop.objects.filter(pk=id)
       data = json.loads(serializers.serialize('json', newrecord))
