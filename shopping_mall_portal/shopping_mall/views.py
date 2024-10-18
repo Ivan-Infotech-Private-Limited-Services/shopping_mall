@@ -10,21 +10,26 @@ def ShopView(request):
       data = serializers.serialize("json", Shop.objects.all())
       return JsonResponse(json.loads(data), safe=False)
    elif request.method == 'POST':
-      
-      body = json.loads(request.body.decode("utf-8"))
-      newrecord = Shop.objects.create(
-         name=body['name'],
-         description=body['description'],
-         owner_name = body['owner_name'],
-         shop_no = body['shop_no'],
-         address = body['address'],
-         phone1 = body['phone1'],
-         phone2 = body['phone2'],
-         image_url=body['image_url'],
+      unique_value = request.POST.get('shop_no')
+      unique_value2 = request.POST.get('phone1')
+      unique_value3 = request.POST.get('phone2')
+      if Shop.objects.filter(shop_no=unique_value).exists() or Shop.objects.filter(phone1=unique_value2).exists() or Shop.objects.filter(phone2=unique_value3).exists():
+         return JsonResponse({"message": "Shop number, phone1 or phone2 already exists"}, status=409)
+      else:
+         body = json.loads(request.body.decode("utf-8"))
+         newrecord = Shop.objects.create(
+            name=body['name'],
+            description=body['description'],
+            owner_name = body['owner_name'],
+            shop_no = body['shop_no'],
+            address = body['address'],
+            phone1 = body['phone1'],
+            phone2 = body['phone2'],
+            image_url=body['image_url'],
          )
-      data = json.loads(serializers.serialize('json', [newrecord]))
-      return JsonResponse({"message": "Shop created successfully","data":data})
-    #   return JsonResponse({"message": "Shop created successfully"}, status=201, data=data, safe=False)
+         data = json.loads(serializers.serialize('json', [newrecord]))
+         return JsonResponse({"message": "Shop created successfully","data":data})
+   #   return JsonResponse({"message": "Shop created successfully"}, status=201, data=data, safe=False)
    else:
       return JsonResponse({"message": "Invalid request method"}, status=405)
 

@@ -11,10 +11,10 @@ class Shop(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
     owner_name = models.CharField(max_length=70)
-    shop_no = models.CharField(max_length=80)
+    shop_no = models.CharField(max_length=80, unique=True, db_index=True)
     address = models.CharField(max_length=150)
-    phone1 = models.CharField(max_length=50)
-    phone2 = models.CharField(max_length=50, null=True, blank=True)
+    phone1 = models.CharField(max_length=50, unique=True, db_index=True)
+    phone2 = models.CharField(max_length=50, null=True, blank=True, unique=True, db_index=True)
     image_url = models.URLField()
     def __str__(self):
         return self.name
