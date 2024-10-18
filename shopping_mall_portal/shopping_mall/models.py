@@ -21,8 +21,8 @@ class Shop(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=50)
-    shop = models.ForeignKey(Shop, on_delete= models.RESTRICT)
-    category = models.ForeignKey(Category, on_delete= models.RESTRICT)
+    shop = models.ForeignKey(Shop, on_delete= models.CASCADE)
+    category = models.ForeignKey(Category, on_delete= models.CASCADE)
     brand_name = models.CharField(max_length= 50, null=True, blank=True)
     price = models.FloatField(null=True)
     discount_price = models.FloatField( blank=True, default=0)
