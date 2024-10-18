@@ -115,6 +115,12 @@ def ProductView(request):
          name=body['name'],
          category=Category.objects.get(pk=body['category']),
          shop=Shop.objects.get(pk=body['shop']),
+         brand_name=body['brand_name'],
+         price=body['price'],
+         discount_price=body['discount_price'],
+         image_url=body['image_url'],
+         stock_count=body['stock_count'],
+         variant=body['variant'],
       )
       data = json.loads(serializers.serialize('json', [newrecord]))
       return JsonResponse({"message": "Product created successfully","data":data})
@@ -129,6 +135,12 @@ def ProductViewTwo(request, id):
          name=body['name'],
          category=Category.objects.get(pk=body['category']),
          shop=Shop.objects.get(pk=body['shop']),
+         brand_name=body['brand_name'],
+         price=body['price'],
+         discount_price=body['discount_price'],
+         image_url=body['image_url'],
+         stock_count=body['stock_count'],
+         variant=body['variant'],
       )
       newrecord = Product.objects.filter(pk=id)
       data = json.loads(serializers.serialize('json', newrecord))
