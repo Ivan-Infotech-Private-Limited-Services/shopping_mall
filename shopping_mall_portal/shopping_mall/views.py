@@ -25,7 +25,6 @@ def ShopView(request):
          )
          data = json.loads(serializers.serialize('json', [newrecord]))
          return JsonResponse({"message": "Shop created successfully","data":data[2]}, status=201)
-      #   return JsonResponse({"message": "Shop created successfully"}, status=201, data=data, safe=False)
       except django.db.utils.IntegrityError:
          return JsonResponse({"message":"UNIQUE constraint failed"}, status = 400)
    else:
