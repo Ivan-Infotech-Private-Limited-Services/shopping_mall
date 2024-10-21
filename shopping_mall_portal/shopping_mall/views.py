@@ -8,8 +8,16 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def ShopView(request):
    if request.method == 'GET':
-      data = serializers.serialize("json", Shop.objects.all())
-      return JsonResponse(json.loads(data[2]), safe=False, status=200)
+      data = json.loads(serializers.serialize("json", Shop.objects.all()))
+      
+      print(type(data), "------------------------------------------------------------------------")
+      f=[]
+      for i in data:
+         print(type(i))
+         # print(i['model'],"++++++++++++++")
+         f.append(i['fields'])
+      print(f, "********************************")
+      return JsonResponse(f, safe=False, status=200)
    elif request.method == 'POST':
       try:
          body = json.loads(request.body.decode("utf-8"))
@@ -24,7 +32,8 @@ def ShopView(request):
             image_url=body['image_url'],
          )
          data = json.loads(serializers.serialize('json', [newrecord]))
-         return JsonResponse({"message": "Shop created successfully","data":data[2]}, status=201)
+         
+         return JsonResponse({"message": "Shop created successfully","data":data[0]['fields']}, status=201)
       except django.db.utils.IntegrityError:
          return JsonResponse({"message":"UNIQUE constraint failed"}, status = 400)
    else:
@@ -46,7 +55,7 @@ def ShopViewTwo(request, id):
       )
       newrecord = Shop.objects.filter(pk=id)
       data = json.loads(serializers.serialize('json', newrecord))
-      return JsonResponse({"message": "Shop updated successfully","data":data[2]}, status=201)
+      return JsonResponse({"message": "Shop updated successfully","data":data[0]['fields']}, status=201)
    elif request.method == 'DELETE':
       shop = Shop.objects.get(pk=id)
       has_childeren = Product.objects.filter(shop=shop).exists()
@@ -55,7 +64,7 @@ def ShopViewTwo(request, id):
          Shop.objects.filter(pk=id).delete()
          newrecord = Shop.objects.all()
          data = json.loads(serializers.serialize('json', newrecord))
-         return JsonResponse({"message": "Shop deleted successfully","data":data[2]}, status=204)
+         return JsonResponse({"message": "Shop deleted successfully","data":data[0]['fields']}, status=204)
       else:
          return JsonResponse({"message": "Cannot delete the shop"}, status=403)
    elif request.method == 'GET':
