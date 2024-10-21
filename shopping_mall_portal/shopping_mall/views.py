@@ -148,7 +148,6 @@ def ProductViewTwo(request, id):
       data = json.loads(serializers.serialize('json', newrecord))
       return JsonResponse({"message": "Product updated successfully","data":data[2]}, status=201)
    elif request.method == 'DELETE':
-      # body = json.loads(request.body.decode("utf-8"))
       Product.objects.filter(pk=id).delete()
       newrecord = Product.objects.all()
       data = json.loads(serializers.serialize('json', newrecord))
