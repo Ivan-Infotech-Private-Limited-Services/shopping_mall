@@ -1,3 +1,4 @@
+import django
 from django.http import JsonResponse
 from shopping_mall.models import *
 from django.core import serializers
@@ -8,15 +9,10 @@ from django.views.decorators.csrf import csrf_exempt
 def ShopView(request):
    if request.method == 'GET':
       data = serializers.serialize("json", Shop.objects.all())
-      return JsonResponse(json.loads(data['fields']), safe=False)
+      return JsonResponse(json.loads(data[2]), safe=False, status=200)
    elif request.method == 'POST':
-      body = json.loads(request.body.decode("utf-8"))
-      unique_value = request.POST.get('shop_no')
-      unique_value2 = request.POST.get('phone1')
-      unique_value3 = request.POST.get('phone2')
-      if Shop.objects.filter(shop_no=unique_value).exists() or Shop.objects.filter(phone1=unique_value2).exists() or Shop.objects.filter(phone2=unique_value3).exists():
-         return JsonResponse({"message": "Shop number, phone1 or phone2 already exists"}, status=409)
-      else:
+      try:
+         body = json.loads(request.body.decode("utf-8"))
          newrecord = Shop.objects.create(
             name=body['name'],
             description=body['description'],
@@ -28,8 +24,10 @@ def ShopView(request):
             image_url=body['image_url'],
          )
          data = json.loads(serializers.serialize('json', [newrecord]))
-         return JsonResponse({"message": "Shop created successfully","data":data['fields']})
-   #   return JsonResponse({"message": "Shop created successfully"}, status=201, data=data, safe=False)
+         return JsonResponse({"message": "Shop created successfully","data":data[2]}, status=201)
+      #   return JsonResponse({"message": "Shop created successfully"}, status=201, data=data, safe=False)
+      except django.db.utils.IntegrityError:
+         return JsonResponse({"message":"UNIQUE constraint failed"})
    else:
       return JsonResponse({"message": "Invalid request method"}, status=405)
 
@@ -49,22 +47,22 @@ def ShopViewTwo(request, id):
       )
       newrecord = Shop.objects.filter(pk=id)
       data = json.loads(serializers.serialize('json', newrecord))
-      return JsonResponse({"message": "Shop updated successfully","data":data['fields']})
+      return JsonResponse({"message": "Shop updated successfully","data":data[2]}, status=201)
    elif request.method == 'DELETE':
       shop = Shop.objects.get(pk=id)
-      has_childeren = Product.objects.filter(parent=shop).exists()
+      has_childeren = Product.objects.filter(shop=shop).exists()
       if has_childeren == False:
          # body = json.loads(request.body.decode("utf-8"))
          Shop.objects.filter(pk=id).delete()
          newrecord = Shop.objects.all()
          data = json.loads(serializers.serialize('json', newrecord))
-         return JsonResponse({"message": "Shop deleted successfully","data":data['fields']})
+         return JsonResponse({"message": "Shop deleted successfully","data":data[2]}, status=204)
       else:
-         return JsonResponse({"message": "Cannot delete the shop"}, status=404)
+         return JsonResponse({"message": "Cannot delete the shop"}, status=403)
    elif request.method == 'GET':
       newrecord = Shop.objects.filter(pk=id)
       data = json.loads(serializers.serialize('json', newrecord))
-      return JsonResponse(data['fields'], safe=False)
+      return JsonResponse(json.loads(data[2]), safe=False, status=200)
    else:
       return JsonResponse({"message": "Invalid request method"}, status=405)
 
@@ -72,7 +70,7 @@ def ShopViewTwo(request, id):
 def CategoryView(request):
    if request.method == 'GET':
       data = serializers.serialize("json", Category.objects.all())
-      return JsonResponse(json.loads(data), safe=False)
+      return JsonResponse(json.loads(data[2]), safe=False, status=200)
    elif request.method == 'POST':
       body = json.loads(request.body.decode("utf-8"))
       newrecord = Category.objects.create(
@@ -81,7 +79,7 @@ def CategoryView(request):
          image_url=body['image_url'],
       )
       data = json.loads(serializers.serialize('json', [newrecord]))
-      return JsonResponse({"message": "Category created successfully","data":data['fields']})
+      return JsonResponse({"message": "Category created successfully","data":data[2]}, status=201)
    else:
       return JsonResponse({"message": "Invalid request method"}, status=405)
 
@@ -96,17 +94,17 @@ def CategoryViewTwo(request, id):
       )
       newrecord = Category.objects.filter(pk=id)
       data = json.loads(serializers.serialize('json', newrecord))
-      return JsonResponse({"message": "Category updated successfully","data":data})
+      return JsonResponse({"message": "Category updated successfully","data":data[2]}, status=201)
    elif request.method == 'DELETE':
       # body = json.loads(request.body.decode("utf-8"))
       Category.objects.filter(pk=id).delete()
       newrecord = Category.objects.all()
       data = json.loads(serializers.serialize('json', newrecord))
-      return JsonResponse({"message": "Category deleted successfully","data":data['fields']})
+      return JsonResponse({"message": "Category deleted successfully","data":data[2]}, status=204)
    elif request.method == 'GET':
       newrecord = Category.objects.filter(pk=id)
       data = json.loads(serializers.serialize('json', newrecord))
-      return JsonResponse(data, safe=False)
+      return JsonResponse(data[2], safe=False, status=200)
    else:
       return JsonResponse({"message": "Invalid request method"}, status=405)
 
@@ -114,7 +112,7 @@ def CategoryViewTwo(request, id):
 def ProductView(request):
    if request.method == 'GET':
       data = serializers.serialize("json", Product.objects.all())
-      return JsonResponse(json.loads(data['fields']), safe=False)
+      return JsonResponse(json.loads(data[2]), safe=False, status=200)
    elif request.method == 'POST':
       body = json.loads(request.body.decode("utf-8"))
       newrecord = Product.objects.create(
@@ -129,7 +127,7 @@ def ProductView(request):
          variant=body['variant'],
       )
       data = json.loads(serializers.serialize('json', [newrecord]))
-      return JsonResponse({"message": "Product created successfully","data":data['fields']})
+      return JsonResponse({"message": "Product created successfully","data":data[2]}, status=201)
    else:
       return JsonResponse({"message": "Invalid request method"}, status=405)
 
@@ -150,16 +148,16 @@ def ProductViewTwo(request, id):
       )
       newrecord = Product.objects.filter(pk=id)
       data = json.loads(serializers.serialize('json', newrecord))
-      return JsonResponse({"message": "Product updated successfully","data":data['fields']})
+      return JsonResponse({"message": "Product updated successfully","data":data[2]}, status=201)
    elif request.method == 'DELETE':
       # body = json.loads(request.body.decode("utf-8"))
       Product.objects.filter(pk=id).delete()
       newrecord = Product.objects.all()
       data = json.loads(serializers.serialize('json', newrecord))
-      return JsonResponse({"message": "Product deleted successfully","data":data['fields']})
+      return JsonResponse({"message": "Product deleted successfully","data":data[2]}, status=204)
    elif request.method == 'GET':
       newrecord = Product.objects.filter(pk=id)
       data = json.loads(serializers.serialize('json', newrecord))
-      return JsonResponse(data['fields'], safe=False)
+      return JsonResponse(data[2], safe=False, status=200)
    else:
       return JsonResponse({"message": "Invalid request method"}, status=405)
