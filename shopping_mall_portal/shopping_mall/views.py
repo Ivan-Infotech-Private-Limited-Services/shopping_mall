@@ -95,7 +95,6 @@ def CategoryViewTwo(request, id):
       data = json.loads(serializers.serialize('json', newrecord))
       return JsonResponse({"message": "Category updated successfully","data":data[2]}, status=201)
    elif request.method == 'DELETE':
-      # body = json.loads(request.body.decode("utf-8"))
       Category.objects.filter(pk=id).delete()
       newrecord = Category.objects.all()
       data = json.loads(serializers.serialize('json', newrecord))
